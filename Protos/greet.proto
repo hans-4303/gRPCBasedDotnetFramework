@@ -1,0 +1,25 @@
+// proto 파일 - 속성 - protobuf 빌드 옵션 선택, 그러면 해당하는 cs 파일 발생
+
+// proto3 신택스 따르기
+syntax = "proto3";
+
+// 네임스페이스 설정해주기
+option csharp_namespace = "gRPCBasedDotnetFramework";
+
+package gRPCBasedDotnetFramework;
+
+// 서비스 정의해주기
+service Greeter {
+	// 어떤 프로시저를 실행할 수 있고, 어떤 메시지를 받아 어떤 메시지를 돌려준다
+  rpc SayHello (HelloRequest) returns (HelloReply);
+}
+
+// 요청 메시지, 필드와 고유 번호
+message HelloRequest {
+  string name = 1;
+}
+
+// 응답 메시지, 필드와 고유 번호
+message HelloReply {
+  string message = 1;
+}
