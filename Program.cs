@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace gRPCBasedDotnetFramework
@@ -12,7 +13,7 @@ namespace gRPCBasedDotnetFramework
 	public class GreeterService : Greeter.GreeterBase
 	{
 		/// <summary>
-		/// 파라미터는 자동 생성된 Greet.cs에서 정의한 형태
+		/// 파라미터는 자동 생성된 Greet.cs에서 정의 + Grpc.Core에서 이미 정의된 타입
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="context"></param>
@@ -23,6 +24,49 @@ namespace gRPCBasedDotnetFramework
 			{
 				Message = $"Hello, {request.Name}!"
 			});
+		}
+
+		/// <summary>
+		/// 파라미터는 자동 생성된 Greet.cs에서 정의 + Grpc.Core에서 이미 정의된 타입
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="responseStream"></param>
+		/// <param name="context"></param>
+		/// <returns></returns>
+		public override async Task SayHelloStream (HelloRequest request, IServerStreamWriter<HelloReply> responseStream, ServerCallContext context)
+		{
+			// 반복해서 처리
+			for (int i = 0; i < 5; i++)
+			{
+				// 서버 측에서 응답 스트림에 접근해서 비동기로 HelloReply를 작성해준다
+				await responseStream.WriteAsync(new HelloReply
+				{
+					Message = $"Hello, {request.Name}! Message {i + 1}"
+				});
+				await Task.Delay(1000); // 1초 대기
+			}
+		}
+
+		/// <summary>
+		/// 파라미터는 자동 생성된 Greet.cs에서 정의 + Grpc.Core에서 이미 정의된 타입
+		/// </summary>
+		/// <param name="requestStream"></param>
+		/// <param name="context"></param>
+		/// <returns></returns>
+		public override async Task<HelloReply> SayHelloClientStream (IAsyncStreamReader<HelloRequest> requestStream, ServerCallContext context)
+		{
+			// 스트링 빌더를 만들어준다
+			var sb = new StringBuilder();
+
+			// 클라이언트 측 스트리밍의 요청을 보고 MoveNext()를 할 수 없을 때까지, 그러니까 모든 요청을 처리할 때까지
+			while (await requestStream.MoveNext())
+			{
+				// sb에 내용을 작성한다
+				sb.AppendLine($"Hello, {requestStream.Current.Name}!");
+			}
+
+			// HelloReply를 반환하되 메시지는 내용 들어간 sb로 처리
+			return new HelloReply { Message = sb.ToString() };
 		}
 	}
 

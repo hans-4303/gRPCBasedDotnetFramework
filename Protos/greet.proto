@@ -12,6 +12,12 @@ package gRPCBasedDotnetFramework;
 service Greeter {
 	// 어떤 프로시저를 실행할 수 있고, 어떤 메시지를 받아 어떤 메시지를 돌려준다
   rpc SayHello (HelloRequest) returns (HelloReply);
+
+  // 서버 스트리밍 RPC
+  rpc SayHelloStream (HelloRequest) returns (stream HelloReply);
+
+  // 클라이언트 스트리밍 RPC
+  rpc SayHelloClientStream (stream HelloRequest) returns (HelloReply);
 }
 
 // 요청 메시지, 필드와 고유 번호
